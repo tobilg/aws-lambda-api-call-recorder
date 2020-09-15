@@ -23,7 +23,7 @@ $ npm i --save aws-lambda-api-call-recorder
 
 To use the client library, you can wrap you handler function with `ApiCallRecorder`:
 
-```javscript
+```javascript
 const AWS = require('aws-sdk');
 const ApiCallRecorder = require('aws-lambda-api-call-recorder');
 
