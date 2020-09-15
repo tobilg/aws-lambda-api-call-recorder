@@ -54,6 +54,15 @@ Also, you will have to set the following environment variables to enable the det
 * Either `NODE_ENV` needs to be set to `development`, or, in case you want `production`, you can additionally set `API_CALL_RECORDER_IS_ACTIVATED` to `true`
 * `API_CALL_RECORDER_DELIVERY_STREAM_NAME` needs to be set to the name of the Kinesis DeliveryStream. In case you use the Serverless framework and already installed the backend, you should be able to use the backed stack's output for this: `${cf:api-call-recorder-backend-${self:provider.stage}.ApiCallRecorderDeliveryStreamName}`
 
+Also, make sure that the IAM execution role of your Lambda function has the following permissions to write to the Kinesis Firehose DeliveryStream (this assumes you already have deployed the backend, and the stage is the same as of your Lambda function):
+
+```yaml
+- Effect: Allow
+  Action:
+    - firehose:PutRecordBatch
+  Resource: '${cf:api-call-recorder-backend-${self:provider.stage}.ApiCallRecorderDeliveryStreamArn}'
+```
+
 **Hints**:  
 * Running production workloads with the `APICallRecorder` enabled is not advise, because it will add latency (and hence, costs)
 * The `APICallRecorder` will **NOT** log the final upload of the recorded events to the Firehose DeliveryStream
