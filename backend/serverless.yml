@@ -36,7 +36,6 @@ custom:
       errorPrefix: 'error/!{timestamp:yyyy}-!{timestamp:MM}-!{timestamp:dd}/!{firehose:error-output-type}/'
   # Define the S3 defaults
   s3:
-    
     bucketName: api-call-recorder-#{AWS::AccountId}-${self:provider.stage}
     rawPrefix: 'incoming/'
     errorPrefix: 'firehose-errors/'
