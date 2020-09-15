@@ -1,0 +1,16 @@
+# Create a LogGroup
+Resources:
+  CallDataLogGroup:
+    Type: 'AWS::Logs::LogGroup'
+    Properties:
+      LogGroupName: ${self:custom.logs.groupName}
+      RetentionInDays: ${self:custom.logs.retentionInDays}
+
+  # Create a LogStream
+  ApiCallRecorderCWLogStream:
+    Type: 'AWS::Logs::LogStream'
+    DependsOn:
+      - CallDataLogGroup
+    Properties:
+      LogGroupName: ${self:custom.logs.groupName}
+      LogStreamName: ${self:custom.logs.streamName}

@@ -1,0 +1,56 @@
+Resources:
+  CallsTable:
+    Type: AWS::Glue::Table
+    Properties:
+      CatalogId: '#{AWS::AccountId}'
+      DatabaseName: '#{ApiCallRecorderDatabase}'
+      TableInput:
+        Name: '${self:custom.glue.tableName}'
+        Description: 'Gzipped JSON incoming events via MQTT'
+        TableType: EXTERNAL_TABLE
+        PartitionKeys:
+          - Name: date
+            Type: string
+        StorageDescriptor:
+          OutputFormat: org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat
+          Columns:
+            - Name: version
+              Type: int
+            - Name: clientid
+              Type: string
+            - Name: type
+              Type: string
+            - Name: service
+              Type: string
+            - Name: api
+              Type: string
+            - Name: timestamp
+              Type: bigint
+            - Name: attemptlatency
+              Type: int
+            - Name: fqdn
+              Type: string
+            - Name: useragent
+              Type: string
+            - Name: accesskey
+              Type: string
+            - Name: region
+              Type: string
+            - Name: httpstatuscode
+              Type: int
+            - Name: xamzrequestid
+              Type: string
+            - Name: xamzid2
+              Type: string
+            - Name: finalhttpstatuscode
+              Type: int
+            - Name: latency
+              Type: int
+            - Name: maxretriesexceeded
+              Type: int
+            - Name: functionname
+              Type: string
+          InputFormat: org.apache.hadoop.mapred.TextInputFormat
+          Location: 's3://#{ApiCallsS3Bucket}/${self:custom.s3.rawPrefix}'
+          SerdeInfo:
+            SerializationLibrary: org.openx.data.jsonserde.JsonSerDe

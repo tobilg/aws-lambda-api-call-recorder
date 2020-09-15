@@ -1,0 +1,21 @@
+{
+  "name": "api-call-recorder-example",
+  "version": "0.1.0",
+  "description": "Example AWS Lambda project to showcase the API Call Recorder functionalities",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "bugs": {
+    "url": "https://github.com/tobilg/aws-lambda-api-call-recorder/issues"
+  },
+  "homepage": "https://github.com/tobilg/aws-lambda-api-call-recorder#readme",
+  "keywords": [],
+  "author": "TobiLG <tobilg@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "aws-sdk": "^2.751.0"
+  },
+  "devDependencies": {
+    "serverless-iam-roles-per-function": "^2.0.2"
+  }
+}

@@ -1,0 +1,73 @@
+# Create a Kinesis DeliveryStream to write the incoming data to S3
+# See docs at https://docs.aws.amazon.com/firehose/latest/APIReference/API_CreateDeliveryStream.html
+Resources:
+  ApiCallRecorderKinesisFirehose:
+    Type: 'AWS::KinesisFirehose::DeliveryStream'
+    Properties:
+      DeliveryStreamName: ${self:custom.kinesis.name}
+      DeliveryStreamType: DirectPut
+      S3DestinationConfiguration:
+        BucketARN: '#{ApiCallsS3Bucket.Arn}'
+        CloudWatchLoggingOptions:
+          Enabled: true
+          LogGroupName: ${self:custom.logs.groupName}
+          LogStreamName: ${self:custom.logs.streamName}
+        BufferingHints:
+          IntervalInSeconds: ${self:custom.kinesis.limits.intervalInSeconds}
+          SizeInMBs: ${self:custom.kinesis.limits.sizeInMB}
+        CompressionFormat: ${self:custom.kinesis.raw.compressionFormat}
+        Prefix: ${self:custom.s3.rawPrefix}${self:custom.kinesis.s3.partitionPrefix}
+        ErrorOutputPrefix: '${self:custom.s3.errorPrefix}${self:custom.kinesis.s3.errorPrefix}'
+        RoleARN: '#{ApiCallRecorderKinesisFirehoseRole.Arn}'
+
+  ApiCallRecorderKinesisFirehoseRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      RoleName: ${self:service.name}-firehose-role-${self:provider.stage}
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: ''
+            Effect: Allow
+            Principal:
+              Service: firehose.amazonaws.com
+            Action: 'sts:AssumeRole'
+            Condition:
+              StringEquals:
+                'sts:ExternalId':
+                  Ref: 'AWS::AccountId'
+
+  ApiCallRecorderPolicyKinesis:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: ${self:service.name}-firehose-policy-${self:provider.stage}
+      Roles:
+        - Ref: ApiCallRecorderKinesisFirehoseRole
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Action:
+              - glue:GetTable
+              - glue:GetTableVersions
+            Resource:
+              - '*'
+          - Effect: Allow
+            Action:
+              - s3:AbortMultipartUpload
+              - s3:GetBucketLocation
+              - s3:GetObject
+              - s3:ListBucket
+              - s3:ListBucketMultipartUploads
+              - s3:PutObject
+            Resource:
+              - 'arn:aws:s3:::${self:custom.s3.bucketName}'
+              - 'arn:aws:s3:::${self:custom.s3.bucketName}/*'
+          - Effect: Allow
+            Action:
+              - logs:CreateLogGroup
+              - logs:CreateLogStream
+              - logs:PutLogEvents
+              - logs:DescribeLogStreams
+            Resource:
+              - '#{CallDataLogGroup.Arn}'

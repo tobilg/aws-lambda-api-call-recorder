@@ -1,5 +1,5 @@
 # aws-lambda-api-call-recorder
-Client and infrastructure for the recording of AWS API calls in Node-based Lambda functions, leveraging AWS Client Side Monitoring.
+Client for the recording of AWS API calls in Node-based Lambda functions, leveraging AWS Client Side Monitoring.
 
 ## Why does this project exist?
 
@@ -7,9 +7,9 @@ Mainly curiosity. But also because AWS CloudTrail doesn't record all API calls, 
 
 Also, it's possible to determine the latencies of the API calls of different AWS services.
 
-## Client
+## Preconditions
 
-To be able to use the client library, you need to have the backend installed in the AWS account you want to record the AWS SDK API calls. Please see the appropriate backend section in this README.
+To be able to use the client library, you need to have the [backend installed](https://github.com/tobilg/aws-lambda-api-call-recorder) in the AWS account you want to record the AWS SDK API calls. Please see the appropriate backend section in the [README](https://github.com/tobilg/aws-lambda-api-call-recorder/README.md).
 
 ### Installation
 
@@ -63,83 +63,3 @@ Also, you will have to set the following environment variables to enable the det
 The client will wrap the Node Lambda function handler, start a UDP server on `localhost` on port `31000`, so that it can receive the published messages of the [AWS Client Side Monitoring](https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/metrics.html) (CSM). Once the wrapped handler functions completes, the UDP server will be kept running another 25ms to make sure all API calls can be recorded. After it's shut down, the API calls will be pushed to a Kinesis Firehose DeliveryStream, which will batch the events to gzipped files in S3. 
 
 Those files in S3 are then made queryable in Athena by an appropriate Glue Table definition.
-
-## Backend
-
-The backend needs to be deployed before you can record the API calls.
-
-### Installation
-
-Please clone the git repo:
-
-```bash
-$ git clone git@github.com:tobilg/aws-lambda-api-call-recorder.git
-```
-
-Then, change to the backend folder:
-
-```bash
-$ cd backend
-```
-
-The deployment of the backend requires the presence of the [Serverless framework](https://www.serverless.com) on the machine from where the backend should be deployed. Also, you'll need to have your AWS credentials setup accordingly. 
-
-If it's present, you can use a single command to deploy the backend:
-
-```bash
-$ sls deploy
-```
-
-### Query the API call logs
-
-To query the API call logs, you can use Athena. Please go to the Athena service in the AWS Console, and select the appropriate database from the selection (`api_calls_$STAGE`). Once you've done that, you should see the table `calls` on the left-hand side.
-
-Example query to get the most use API calls filtered by a specific Lambda function:
-
-```sql
-SELECT
-    service,
-    api,
-    avg(latency) as avg_latency,
-    count(*) as call_cnt
-FROM
-    api_calls_dev.calls
-WHERE
-    functionname = 'api-call-recorder-example-dev-test' -- Example
-AND
-    type = 'ApiCall'
-GROUP BY
-    service,
-    api
-```
-
-**Hint:**  
-If you don't see any data, make sure to run the following SQL command to update the table partitions:
-
-```sql
-MSCK REPAIR TABLE api_calls_dev.calls
-```
-
-## Example project
-
-Please clone the git repo if you haven't done so already:
-
-```bash
-$ git clone git@github.com:tobilg/aws-lambda-api-call-recorder.git
-```
-
-Then, change to the backend folder:
-
-```bash
-$ cd example
-```
-
-The deployment of the example stack requires the presence of the [Serverless framework](https://www.serverless.com) on the machine from where the backend should be deployed. Also, you'll need to have your AWS credentials setup accordingly. 
-
-If it's present, you can use a single command to deploy the example stack:
-
-```bash
-$ sls deploy
-```
-
-The example for a wrapped AWS Lambda function handler can be found at [functions/test.js](example/functions/test.js).

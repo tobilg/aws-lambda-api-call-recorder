@@ -1,0 +1,42 @@
+service:
+  name: api-call-recorder-example
+
+plugins:
+  - serverless-iam-roles-per-function
+
+provider:
+  name: aws
+  region: ${opt:region, 'us-east-1'}
+  stage: ${opt:stage, 'dev'}
+  # Deployment bucket settings
+  deploymentBucket:
+    name: 'serverless-deployment-bucket-562552715877'
+    serverSideEncryption: AES256
+
+functions:
+
+  test:
+    handler: functions/test.handler
+    runtime: nodejs12.x
+    memorySize: 256
+    timeout: 3
+    environment:
+      AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1' # Enable HTTP keep-alive connections for the AWS SDK
+      AWS_CSM_ENABLED: 'true'
+      API_CALL_RECORDER_IS_ACTIVATED: 'true'
+      API_CALL_RECORDER_DELIVERY_STREAM_NAME: ${cf:api-call-recorder-backend-${self:provider.stage}.ApiCallRecorderDeliveryStreamName}
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - firehose:PutRecordBatch
+        Resource: '${cf:api-call-recorder-backend-${self:provider.stage}.ApiCallRecorderDeliveryStreamArn}'
+    events:
+      - httpApi:
+          method: GET
+          path: /test
+
+package:
+  exclude:
+    - docs/**
+    - LICENSE
+    - README.md

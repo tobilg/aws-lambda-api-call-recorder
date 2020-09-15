@@ -1,0 +1,30 @@
+{
+  "name": "aws-lambda-api-call-recorder",
+  "version": "0.0.1",
+  "description": "A recorder of AWS API calls for Lambda functions",
+  "main": "ApiCallRecorder.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tobilg/aws-lambda-api-call-recorder.git"
+  },
+  "keywords": [
+    "aws",
+    "api",
+    "sdk",
+    "recorder",
+    "iam",
+    "permissions"
+  ],
+  "author": "TobiLG <tobilg@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/tobilg/aws-lambda-api-call-recorder/issues"
+  },
+  "homepage": "https://github.com/tobilg/aws-lambda-api-call-recorder#readme",
+  "dependencies": {
+    "aws-sdk": "^2.751.0"
+  }
+}

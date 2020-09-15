@@ -1,0 +1,26 @@
+{
+  "name": "api-call-recorder-backend",
+  "version": "0.1.0",
+  "description": "Backend infrastructure for the AWS SDK API Call Recorder",
+  "scripts": {
+    "cfn-lint": "cfn-lint .serverless/cloudformation-template-update-stack.json",
+    "package": "sls package",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "qa": "npm run package && npm run cfn-lint",
+    "deploy": "sls deploy"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:tobilg/aws-lambda-api-call-recorder.git"
+  },
+  "author": "TobiLG <tobilg@gmail.com>",
+  "license": "UNLICENSED",
+  "bugs": {
+    "url": "https://github.com/tobilg/aws-lambda-api-call-recorder/issues"
+  },
+  "homepage": "https://github.com/tobilg/aws-lambda-api-call-recorder#readme",
+  "devDependencies": {
+    "serverless-pseudo-parameters": "^2.5.0"
+  },
+  "dependencies": {}
+}

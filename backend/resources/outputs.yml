@@ -1,0 +1,11 @@
+Outputs:
+  ApiCallRecorderDeliveryStreamName:
+    Description: The name of the API Call Recorder Kinesis Firehose DeliveryStream
+    Value: '#{ApiCallRecorderKinesisFirehose}'
+    Export:
+      Name: 'ApiCallRecorderDeliveryStreamName'
+  ApiCallRecorderDeliveryStreamArn:
+    Description: The ARN of the API Call Recorder Kinesis Firehose DeliveryStream
+    Value: '#{ApiCallRecorderKinesisFirehose.Arn}'
+    Export:
+      Name: 'ApiCallRecorderDeliveryStreamArn'

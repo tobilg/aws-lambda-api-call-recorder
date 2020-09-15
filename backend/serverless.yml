@@ -1,0 +1,75 @@
+# Service name
+service:
+  name: api-call-recorder-backend
+
+# List all plugins used
+plugins:
+  - serverless-pseudo-parameters
+
+# Custom config
+custom:
+  # Define defaults
+  defaults:
+    # Define the default stage
+    stage: dev
+    # Define the default region
+    region: us-east-1
+
+  # Define the default CloudWatch logs settings
+  logs:
+    retentionInDays: 14
+    groupName: 'kinesis/api-call-recorder-backend/${self:provider.stage}'
+    streamName: 'KinesisFirehoseLogStream'
+  # Define the default Kinesis settings
+  kinesis:
+    name: '${self:service.name}-delivery-stream-${self:provider.stage}'
+    limits:
+      intervalInSeconds: 60
+      sizeInMB: 128
+    raw:
+      compressionFormat: GZIP
+    s3:
+      # NOTE:
+      # 1. prefixes are appended to s3 prefix configuration
+      # 2. If the partition layout in s3 is changed the partitionMetaDataStore function accordingly
+      partitionPrefix: 'date=!{timestamp:yyyy}-!{timestamp:MM}-!{timestamp:dd}/'
+      errorPrefix: 'error/!{timestamp:yyyy}-!{timestamp:MM}-!{timestamp:dd}/!{firehose:error-output-type}/'
+  # Define the S3 defaults
+  s3:
+    
+    bucketName: api-call-recorder-#{AWS::AccountId}-${self:provider.stage}
+    rawPrefix: 'incoming/'
+    errorPrefix: 'firehose-errors/'
+  # Define the Glue defaults
+  glue:
+    databaseName: api_calls_${self:provider.stage}
+    tableName: calls
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  region: ${opt:region, self:custom.defaults.region}
+  stage: ${opt:stage, self:custom.defaults.stage}
+  # Deployment bucket settings
+  deploymentBucket:
+    name: 'serverless-deployment-bucket-562552715877'
+    serverSideEncryption: AES256
+
+resources:
+  # Create Glue database
+  - ${file(./resources/glue-db.yml)}
+
+  # Create Glue table
+  - ${file(./resources/glue-table.yml)}
+
+  # Kinesis Firehose Delivery Stream for writing out to the S3 data management storage
+  - ${file(./resources/kinesis-firehose-delivery-stream.yml)}
+
+  # S3 bucket for data management storage and metadata
+  - ${file(./resources/s3-bucket.yml)}
+
+  # LogGroup and LogStream for the Kinesis Delivery Stream
+  - ${file(./resources/kinesis-cloudwatch-logs.yml)}
+
+  # Stack outputs
+  - ${file(./resources/outputs.yml)}

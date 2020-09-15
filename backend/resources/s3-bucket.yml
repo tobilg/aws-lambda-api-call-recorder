@@ -1,0 +1,10 @@
+# Create an encrypted S3 bucket
+Resources:
+  ApiCallsS3Bucket:
+    Type: 'AWS::S3::Bucket'
+    Properties:
+      BucketName: ${self:custom.s3.bucketName}
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: 'AES256'
