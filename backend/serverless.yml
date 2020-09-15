@@ -50,10 +50,6 @@ provider:
   runtime: nodejs12.x
   region: ${opt:region, self:custom.defaults.region}
   stage: ${opt:stage, self:custom.defaults.stage}
-  # Deployment bucket settings
-  deploymentBucket:
-    name: 'serverless-deployment-bucket-562552715877'
-    serverSideEncryption: AES256
 
 resources:
   # Create Glue database

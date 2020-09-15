@@ -8,10 +8,6 @@ provider:
   name: aws
   region: ${opt:region, 'us-east-1'}
   stage: ${opt:stage, 'dev'}
-  # Deployment bucket settings
-  deploymentBucket:
-    name: 'serverless-deployment-bucket-562552715877'
-    serverSideEncryption: AES256
 
 functions:
 
